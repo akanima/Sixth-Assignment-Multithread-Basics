@@ -23,9 +23,16 @@ public class CPU_Simulator
         long processingTime;
         String ID;
         public Task(String ID, long processingTime) {
+            this.processingTime=processingTime;
+            this.ID=ID;
         // TODO
         }
-
+        public long getProcessingTime(){
+            return this.processingTime;
+        }
+        public String getID(){
+            return this.ID;
+        }
     /*
         Simulate running a task by utilizing the sleep method for the duration of
         the task's processingTime. The processing time is given in milliseconds.
@@ -43,7 +50,29 @@ public class CPU_Simulator
     */
     public ArrayList<String> startSimulation(ArrayList<Task> tasks) {
         ArrayList<String> executedTasks = new ArrayList<>();
-
+        for(int i=0; i<tasks.size();i++) {
+            for (int j=tasks.size()-1;j>i;j--){
+                Task task=new Task(tasks.get(i).getID(),tasks.get(i).getProcessingTime());
+                Thread t=new Thread(task);
+                t.start();
+                try{
+                    t.join();
+                }
+                catch (InterruptedException exception){
+                    throw new RuntimeException(exception);
+                }
+                finally {
+                    if(tasks.get(i).getProcessingTime()>tasks.get(j).getProcessingTime()){
+                        Task tmp=tasks.get(i);
+                        tasks.set(i,tasks.get(j));
+                        tasks.set(j,tmp);
+                    }
+                }
+            }
+        }
+        for(int i=0 ; i<tasks.size();i++){
+            executedTasks.add(tasks.get(i).getID());
+        }
         // TODO
 
         return executedTasks;

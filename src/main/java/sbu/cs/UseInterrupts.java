@@ -10,6 +10,11 @@ package sbu.cs;
     Take note that you are NOT ALLOWED to change or delete any existing line of code.
  */
 
+import jdk.nashorn.internal.ir.WhileNode;
+
+import java.time.Duration;
+import java.time.Instant;
+
 public class UseInterrupts
 {
 /*
@@ -66,10 +71,12 @@ public class UseInterrupts
         public void run() {
             System.out.println(this.getName() + " is Active.");
 
-            for (int i = 0; i < 10; i += 3)
+            for (int i = 0; i < 10 && !Thread.currentThread().isInterrupted(); i += 3)
             {
                 i -= this.value;
-
+            }
+            if(Thread.currentThread().isInterrupted()){
+               System.out.println('{'+Thread.currentThread().getName()+'}'+"has been interrupted");
             }
         }
     }
@@ -81,11 +88,24 @@ public class UseInterrupts
     public static void main(String[] args) {
         SleepThread sleepThread = new SleepThread(5);
         sleepThread.start();
+        Instant start=Instant.now();
+        while(sleepThread.isAlive()){
+            if(Duration.between(start,Instant.now()).getSeconds()>3){
+                sleepThread.interrupt();
+            }
+        }
 
         // TODO  Check if this thread runs for longer than 3 seconds (if it does, interrupt it)
 
         LoopThread loopThread = new LoopThread(3);
         loopThread.start();
+        Instant start1=Instant.now();
+        while(loopThread.isAlive()){
+            if(Duration.between(start1,Instant.now()).getSeconds()>3){
+                loopThread.interrupt();
+            }
+        }
+
 
         // TODO  Check if this thread runs for longer than 3 seconds (if it does, interrupt it)
 

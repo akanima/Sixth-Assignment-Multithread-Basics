@@ -19,6 +19,7 @@ package sbu.cs;
     Use the tests provided in the test folder to ensure your code works correctly.
  */
 
+import java.util.ArrayList;
 public class FindMultiples
 {
 
@@ -29,14 +30,68 @@ public class FindMultiples
     The getSum function should be called at the start of your program.
     New Threads and tasks should be created here.
     */
-    public int getSum(int n) {
-        int sum = 0;
-
-        // TODO
-
+    static ArrayList<Integer> divisors=new ArrayList<>();
+    public static ArrayList removingDuplicates(ArrayList<Integer> divisors){
+        ArrayList<Integer> x=new ArrayList<>();
+        for(int i=0 ; i<divisors.size();i++){
+            if(!x.contains(divisors.get(i))){
+                x.add(divisors.get(i));
+            }
+        }
+        return x;
+    }
+    public static int calculatingSum(ArrayList<Integer> divisorsWithoutDuplicateElements){
+        int sum=0;
+        for(int i=0 ; i<divisorsWithoutDuplicateElements.size();i++){
+            sum=sum+divisorsWithoutDuplicateElements.get(i);
+        }
         return sum;
     }
+    public int getSum(int n) {
+        FindMultiples findMultiples=new FindMultiples();
+        int sum = 0;
+        divisibleBy3Runnable d3=new divisibleBy3Runnable(n,findMultiples);
+        divisibleBy5Runnable d5=new divisibleBy5Runnable(n,findMultiples);
+        divisibleBy7Runnable d7=new divisibleBy7Runnable(n,findMultiples);
+        Thread a=new Thread(d3);
+        Thread b=new Thread(d5);
+        Thread c=new Thread(d7);
+        try{
+            a.start();
+            a.join();
+            b.start();
+            b.join();
+            c.start();
+            c.join();
+        }
+        catch (InterruptedException e){}
+        ArrayList<Integer> withoutDuplicates=removingDuplicates(divisors);
+        sum=calculatingSum(withoutDuplicates);
+        // TODO
+        return sum;
+    }
+    public class divisibleBy3Runnable implements Runnable{
+        int No;
+        FindMultiples findMultiples=new FindMultiples();
+        public divisibleBy3Runnable(int No, FindMultiples findMultiples){
+            this.No=No;
+            this.findMultiples=findMultiples;
+        }
+        @Override
+        public void run() {
+            try{
+                if(No>=3){
+                    for(int i=3; i<=No; i=i+3) {
+                        divisors.add(i);
+                        Thread.sleep(1);
+                    }
+                }
+            }
+            catch (InterruptedException e){
 
+            }
+        }
+    }
     public static void main(String[] args) {
     }
 }
